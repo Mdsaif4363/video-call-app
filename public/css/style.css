@@ -1,1 +1,285 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 33B816 */
+html {
+    font-size: 10px;
+}
+
+body {
+    background: linear-gradient(120deg, #e0ffe7 0%, #e6e6fa 100%);
+    font-size: 1.6rem;
+    font-family: "Lora", serif;
+    color: #222;
+    min-height: 100vh;
+    overflow: hidden;
+    /* Prevent scrollbars for app feel */
+}
+
+ul li {
+    list-style: none;
+}
+
+/* || standard fonts */
+.lg-h-font {
+    font-size: 3.2rem;
+}
+
+.h-font {
+    font-size: 1.9rem;
+}
+
+.p-font {
+    font-size: 1.4rem;
+}
+
+.s-font {
+    font-size: 1rem;
+}
+
+/* || styling main container */
+.main-container {
+    height: 100vh;
+    display: flex;
+    box-shadow: 0 8px 32px rgba(51, 184, 22, 0.08);
+    border-radius: 24px;
+    margin: 2rem auto;
+    max-width: 120rem;
+    background: #fff;
+    overflow: hidden;
+}
+
+/* Sidebar header for app feel */
+.caller-list-wrapper {
+    flex-basis: 32rem;
+    border-right: 1px solid #d1d1d1;
+    height: 100%;
+    background: linear-gradient(120deg, #f7fdf9 80%, #eaffea 100%);
+    box-shadow: 2px 0 12px rgba(51, 184, 22, 0.07);
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.caller-list-heading {
+    margin: 2.5rem 2rem 1.5rem 2rem;
+    color: #33B816;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 2.2rem;
+    text-shadow: 0 2px 8px #33B81622;
+}
+
+.caller-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 2rem;
+}
+
+.caller-list>li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    background: #f7fdf9;
+    margin: .7rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.7rem;
+    box-shadow: 0 2px 8px rgba(51, 184, 22, 0.06);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+    border: 1px solid #eaffea;
+}
+
+.caller-list>li:hover {
+    background: #eaffea;
+    box-shadow: 0 4px 16px rgba(51, 184, 22, 0.13);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.call-btn {
+    border: none;
+    background: linear-gradient(135deg, #33B816 60%, #7be495 100%);
+    color: #fff;
+    border-radius: 50%;
+    width: 3.2rem;
+    height: 3.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(51, 184, 22, 0.13);
+    border: 2px solid #fff;
+}
+
+.call-btn:hover {
+    background: linear-gradient(135deg, #269c13 60%, #33B816 100%);
+    transform: scale(1.12);
+}
+
+/* || video call container styling */
+.video-call-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(120deg, #fff 80%, #e6e6fa 100%);
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+    box-shadow: 0 0 24px 0 rgba(51, 184, 22, 0.07);
+    padding: 2rem 0;
+    min-width: 0;
+}
+
+.video-streams {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.local-video,
+.remote-video {
+    flex: 1;
+    width: 46rem;
+    min-height: 36rem;
+    max-height: 52rem;
+    background: #181818;
+    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(51, 184, 22, 0.13);
+    border: 2px solid #33B81622;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s, border 0.2s;
+}
+
+.local-video video,
+.remote-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+    background: #222;
+}
+
+.local-video::before,
+.remote-video::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 12px;
+    left: 18px;
+    background: #33B816cc;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 0.4rem 1.2rem;
+    border-radius: 8px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.call {
+    border: none;
+    outline: none;
+    width: 6rem;
+    height: 6rem;
+    background: linear-gradient(135deg, #33B816 60%, #7be495 100%);
+    box-shadow: 0 0 18px 8px rgba(51, 184, 22, 0.13);
+    border-radius: 50%;
+    margin: 2.5rem 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    font-size: 2.2rem;
+    border: 2px solid #fff;
+}
+
+.call:hover {
+    background: linear-gradient(135deg, #269c13 60%, #33B816 100%);
+    transform: scale(1.10);
+    box-shadow: 0 0 24px 12px rgba(51, 184, 22, 0.18);
+}
+
+.d-none {
+    display: none;
+}
+
+.username-input {
+    margin: 2.5rem 0;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    background: #f7fdf9;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(51, 184, 22, 0.09);
+    padding: 1.2rem 2rem;
+    width: fit-content;
+}
+
+.username-input input {
+    width: 26rem;
+    height: 4rem;
+    padding: 0 1.2rem;
+    outline: none;
+    border: 1.5px solid #33B81655;
+    box-shadow: 0 2px 8px rgba(51, 184, 22, 0.09);
+    font-family: 'Lora', sans-serif;
+    font-weight: 500;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    background: #fff;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.username-input input:focus {
+    border: 1.5px solid #33B816;
+    box-shadow: 0 4px 16px rgba(51, 184, 22, 0.13);
+    background: #f7fdf9;
+}
+
+.username-input input::placeholder {
+    font-family: "Lora", serif;
+    color: #a0a0a0;
+}
+
+.username-input button {
+    height: 4rem;
+    outline: none;
+    border: none;
+    background: linear-gradient(135deg, #33B816 60%, #7be495 100%);
+    color: white;
+    padding: 0 2rem;
+    font-family: "Lora", serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(51, 184, 22, 0.13);
+    transition: background 0.2s, transform 0.2s;
+    font-size: 1.5rem;
+    border: 2px solid #fff;
+}
+
+.username-input button:hover {
+    background: linear-gradient(135deg, #269c13 60%, #33B816 100%);
+    transform: scale(1.07);
+}
