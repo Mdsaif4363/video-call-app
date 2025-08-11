@@ -60,6 +60,7 @@ createUserBtn.addEventListener("click", (e) => {
 });
 endCallBtn.addEventListener("click", (e) => {
   socket.emit("call-ended", caller);
+  endCall();
 });
 
 // handle socket events
@@ -101,13 +102,12 @@ socket.on("offer", async ({ from, to, offer }) => {
   await pc.setLocalDescription(answer);
   socket.emit("answer", { from, to, answer: pc.localDescription });
   caller = [from, to];
+  endCallBtn.classList.remove("d-none"); // Show end call button
 });
 socket.on("answer", async ({ from, to, answer }) => {
   const pc = PeerConnection.getInstance();
   await pc.setRemoteDescription(answer);
-  // show end call button
-  endCallBtn.style.display = "block";
-  socket.emit("end-call", { from, to });
+  endCallBtn.classList.remove("d-none"); // Show end call button
   caller = [from, to];
 });
 socket.on("icecandidate", async (candidate) => {
@@ -116,7 +116,7 @@ socket.on("icecandidate", async (candidate) => {
   await pc.addIceCandidate(new RTCIceCandidate(candidate));
 });
 socket.on("end-call", ({ from, to }) => {
-  endCallBtn.style.display = "block";
+  endCallBtn.classList.remove("d-none"); // Show end call button
 });
 socket.on("call-ended", (caller) => {
   endCall();
@@ -140,8 +140,9 @@ const endCall = () => {
   const pc = PeerConnection.getInstance();
   if (pc) {
     pc.close();
-    endCallBtn.style.display = "none";
   }
+  endCallBtn.classList.add("d-none"); // Hide end call button
+  remoteVideo.srcObject = null;
 };
 
 // initialize app
