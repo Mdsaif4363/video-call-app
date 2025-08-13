@@ -3,33 +3,30 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { WebSocketServer } from "ws"; // NEW: For Python connection
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 const allusers = {};
 
-// /your/system/path
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// exposing public directory to outside world
-app.use(express.static("public"));
+app.use(express.static(join(__dirname, "public")));
 
-// handle incoming http request
+
+
+
 app.get("/", (req, res) => {
   console.log("GET Request /");
-  res.sendFile(join(__dirname + "/app/index.html"));
+    res.sendFile(join(__dirname, "app", "index.html"));
 });
 
-// handle socket connections
 io.on("connection", (socket) => {
-  console.log(
-    `Someone connected to socket server and socket id is ${socket.id}`
-  );
+  console.log(`Someone connected to socket server and socket id is ${socket.id}`);
   socket.on("join-user", (username) => {
     console.log(`${username} joined socket connection`);
     allusers[username] = { username, id: socket.id };
-    // inform everyone that someone joined
     io.emit("joined", allusers);
   });
 
@@ -54,12 +51,40 @@ io.on("connection", (socket) => {
 
   socket.on("icecandidate", (candidate) => {
     console.log({ candidate });
-    //broadcast to other peers
     socket.broadcast.emit("icecandidate", candidate);
   });
 });
 
-server.listen(9000, () => {
-  console.log(`Server listening on port 9000`);
-  console.log(` http://localhost:9000 `);
+// -----------------
+// NEW: WebSocket for Python connection
+// -----------------
+const wss = new WebSocketServer({ server });
+
+
+wss.on("connection", (ws) => {
+  console.log("Python connected to WebSocket");
+
+  ws.on("message", (message) => {
+    try {
+      const data = JSON.parse(message.toString());
+      console.log("From Python:", data);
+      // broadcast parsed object to browsers
+      io.emit("translation", data);
+    } catch (err) {
+      console.error("Invalid JSON from Python:", err);
+    }
+  });
+
+  ws.on("close", () => {
+    console.log("Python disconnected");
+  });
 });
+
+// -----------------
+
+const PORT = process.env.PORT || 9000;
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
+
