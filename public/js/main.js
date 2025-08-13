@@ -4,7 +4,53 @@ const allusersHtml = document.getElementById("allusers");
 const localVideo = document.getElementById("localVideo");
 const remoteVideo = document.getElementById("remoteVideo");
 const endCallBtn = document.getElementById("end-call-btn");
+
+
 const socket = io();
+
+// Optional: subtitle element — add in HTML or create dynamically
+let subtitleEl = document.getElementById("subtitle");
+if (!subtitleEl) {
+  subtitleEl = document.createElement("div");
+  subtitleEl.id = "subtitle";
+  subtitleEl.style.position = "absolute";
+  subtitleEl.style.left = "50%";
+  subtitleEl.style.transform = "translateX(-50%)";
+  subtitleEl.style.bottom = "10%";
+  subtitleEl.style.background = "rgba(0,0,0,0.6)";
+  subtitleEl.style.color = "white";
+  subtitleEl.style.padding = "6px 12px";
+  subtitleEl.style.borderRadius = "6px";
+  subtitleEl.style.fontSize = "18px";
+  document.body.appendChild(subtitleEl);
+}
+
+socket.on("translation", (payload) => {
+  try {
+    if (payload.text) {
+      subtitleEl.innerText = payload.text;
+      clearTimeout(subtitleEl._clearT);
+      subtitleEl._clearT = setTimeout(() => { subtitleEl.innerText = ""; }, 4000);
+    }
+
+    if (payload.audio_b64) {
+      const binary = atob(payload.audio_b64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes.buffer], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+      const a = new Audio(url);
+      a.play().catch((e) => {
+        console.warn("Auto-play blocked, user gesture required to play audio", e);
+      });
+      a.onended = () => URL.revokeObjectURL(url);
+    }
+  } catch (e) {
+    console.error("Error handling translation payload", e);
+  }
+});
+
 let localStream;
 let caller = [];
 
@@ -60,7 +106,6 @@ createUserBtn.addEventListener("click", (e) => {
 });
 endCallBtn.addEventListener("click", (e) => {
   socket.emit("call-ended", caller);
-  endCall();
 });
 
 // handle socket events
@@ -102,15 +147,14 @@ socket.on("offer", async ({ from, to, offer }) => {
   await pc.setLocalDescription(answer);
   socket.emit("answer", { from, to, answer: pc.localDescription });
   caller = [from, to];
-  showEndCallBtn(); // Always show end call button
-  remoteVideo.parentElement.classList.remove("d-none");
 });
 socket.on("answer", async ({ from, to, answer }) => {
   const pc = PeerConnection.getInstance();
   await pc.setRemoteDescription(answer);
-  showEndCallBtn(); // Always show end call button
+  // show end call button
+  endCallBtn.style.display = "block";
+  socket.emit("end-call", { from, to });
   caller = [from, to];
-  remoteVideo.parentElement.classList.remove("d-none");
 });
 socket.on("icecandidate", async (candidate) => {
   console.log({ candidate });
@@ -118,8 +162,7 @@ socket.on("icecandidate", async (candidate) => {
   await pc.addIceCandidate(new RTCIceCandidate(candidate));
 });
 socket.on("end-call", ({ from, to }) => {
-  showEndCallBtn(); // Always show end call button
-  remoteVideo.parentElement.classList.remove("d-none");
+  endCallBtn.style.display = "block";
 });
 socket.on("call-ended", (caller) => {
   endCall();
@@ -137,17 +180,14 @@ const startCall = async (user) => {
     to: user,
     offer: pc.localDescription,
   });
-  showEndCallBtn(); // Show end call button when starting a call
 };
 
 const endCall = () => {
   const pc = PeerConnection.getInstance();
   if (pc) {
     pc.close();
+    endCallBtn.style.display = "none";
   }
-  hideEndCallBtn(); // Hide end call button
-  remoteVideo.srcObject = null;
-  // remoteVideo.parentElement.classList.add("d-none");
 };
 
 // initialize app
@@ -164,11 +204,4 @@ const startMyVideo = async () => {
 };
 
 startMyVideo();
-const showEndCallBtn = () => {
-  endCallBtn.classList.remove("d-none");
-  endCallBtn.style.display = "flex";
-};
-const hideEndCallBtn = () => {
-  endCallBtn.classList.add("d-none");
-  endCallBtn.style.display = "none";
-};
+
